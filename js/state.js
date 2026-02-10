@@ -1,96 +1,158 @@
-/* state.js — Global State, Antibiotic DB, Organisms, Sample Presets */
+/* state.js — Global State, Antibiotic DB with EUCAST Breakpoints, Organisms, Sample Presets */
 
 const state = {
   preset: null,
   sampleType: '',
   organism: '',
   colonyCount: '',
-  antibiotics: [],   // current panel [{id, name, class, brand, mic, sir, breakpointS, breakpointR}]
+  colonyCountExp: '',
+  antibiotics: [],
   customAntibiotics: [],
 };
 
-/* ── Antibiotic Master Database ── */
+/* ── Antibiotic Master Database ──
+   Breakpoints EUCAST v15.0 (2025) — Enterobacterales (default)
+   bpS = MIC ≤ value → Sensibile
+   bpR = MIC > value → Resistente
+   Between bpS and bpR → Intermedio (sensibilita' aumentata)
+*/
 const ANTIBIOTICS_DB = {
   // PENICILLINE
-  AMP:  { name:'Ampicillina',              class:'Penicilline',         brand:'Amplital, Ampi' },
-  AMX:  { name:'Amoxicillina',             class:'Penicilline',         brand:'Zimox, Velamox' },
-  AMC:  { name:'Amoxicillina/Ac. Clavulanico', class:'Penicilline + Inibitore', brand:'Augmentin, Clavulin' },
-  AMS:  { name:'Ampicillina/Sulbactam',    class:'Penicilline + Inibitore', brand:'Unasyn, Bethacil' },
-  PIP:  { name:'Piperacillina',            class:'Penicilline',         brand:'Piperital' },
-  TZP:  { name:'Piperacillina/Tazobactam', class:'Penicilline + Inibitore', brand:'Tazocin, Piperacillina/Tazob.' },
-  OXA:  { name:'Oxacillina',               class:'Penicilline',         brand:'Penstapho' },
-  PEN:  { name:'Penicillina G',            class:'Penicilline',         brand:'Penicillina, Benzilpenicillina' },
+  AMP:  { name:'Ampicillina',              class:'Penicilline',         brand:'Amplital, Ampi',                bpS:8,    bpR:8 },
+  AMX:  { name:'Amoxicillina',             class:'Penicilline',         brand:'Zimox, Velamox',                bpS:8,    bpR:8 },
+  AMC:  { name:'Amoxicillina/Ac. Clavulanico', class:'Penicilline + Inibitore', brand:'Augmentin, Clavulin',   bpS:8,    bpR:8 },
+  AMS:  { name:'Ampicillina/Sulbactam',    class:'Penicilline + Inibitore', brand:'Unasyn, Bethacil',          bpS:8,    bpR:8 },
+  PIP:  { name:'Piperacillina',            class:'Penicilline',         brand:'Piperital',                     bpS:8,    bpR:16 },
+  TZP:  { name:'Piperacillina/Tazobactam', class:'Penicilline + Inibitore', brand:'Tazocin, Piperacillina/Tazob.', bpS:8, bpR:16 },
+  OXA:  { name:'Oxacillina',               class:'Penicilline',         brand:'Penstapho',                     bpS:2,    bpR:2 },
+  PEN:  { name:'Penicillina G',            class:'Penicilline',         brand:'Penicillina, Benzilpenicillina',bpS:0.06, bpR:0.06 },
 
   // CEFALOSPORINE
-  CFZ:  { name:'Cefalexina',               class:'Cefalosporine I gen', brand:'Keforal, Ceporex' },
-  CXM:  { name:'Cefuroxima',               class:'Cefalosporine II gen', brand:'Zinnat, Cefurim' },
-  CTX:  { name:'Cefotaxime',               class:'Cefalosporine III gen', brand:'Claforan, Zariviz' },
-  CRO:  { name:'Ceftriaxone',              class:'Cefalosporine III gen', brand:'Rocefin, Fidato' },
-  CAZ:  { name:'Ceftazidime',              class:'Cefalosporine III gen', brand:'Glazidim, Spectrum' },
-  CFX:  { name:'Cefixime',                 class:'Cefalosporine III gen (orale)', brand:'Cefixoral, Suprax' },
-  FEP:  { name:'Cefepime',                 class:'Cefalosporine IV gen', brand:'Maxipime' },
-  CZA:  { name:'Ceftazidime/Avibactam',    class:'Cefalosporine + Inibitore', brand:'Zavicefta' },
-  CZT:  { name:'Ceftolozane/Tazobactam',   class:'Cefalosporine + Inibitore', brand:'Zerbaxa' },
+  CFZ:  { name:'Cefalexina',               class:'Cefalosporine I gen', brand:'Keforal, Ceporex',              bpS:16,   bpR:16 },
+  CXM:  { name:'Cefuroxima',               class:'Cefalosporine II gen', brand:'Zinnat, Cefurim',              bpS:8,    bpR:8 },
+  CTX:  { name:'Cefotaxime',               class:'Cefalosporine III gen', brand:'Claforan, Zariviz',           bpS:1,    bpR:2 },
+  CRO:  { name:'Ceftriaxone',              class:'Cefalosporine III gen', brand:'Rocefin, Fidato',             bpS:1,    bpR:2 },
+  CAZ:  { name:'Ceftazidime',              class:'Cefalosporine III gen', brand:'Glazidim, Spectrum',           bpS:1,    bpR:4 },
+  CFX:  { name:'Cefixime',                 class:'Cefalosporine III gen (orale)', brand:'Cefixoral, Suprax',   bpS:1,    bpR:1 },
+  FEP:  { name:'Cefepime',                 class:'Cefalosporine IV gen', brand:'Maxipime',                     bpS:1,    bpR:4 },
+  CZA:  { name:'Ceftazidime/Avibactam',    class:'Cefalosporine + Inibitore', brand:'Zavicefta',               bpS:8,    bpR:8 },
+  CZT:  { name:'Ceftolozane/Tazobactam',   class:'Cefalosporine + Inibitore', brand:'Zerbaxa',                 bpS:2,    bpR:2 },
 
   // CARBAPENEMI
-  IMP:  { name:'Imipenem',                 class:'Carbapenemi',         brand:'Tienam, Imipenem/Cilastatina' },
-  MEM:  { name:'Meropenem',                class:'Carbapenemi',         brand:'Merrem' },
-  ETP:  { name:'Ertapenem',                class:'Carbapenemi',         brand:'Invanz' },
+  IMP:  { name:'Imipenem',                 class:'Carbapenemi',         brand:'Tienam, Imipenem/Cilastatina',  bpS:2,    bpR:4 },
+  MEM:  { name:'Meropenem',                class:'Carbapenemi',         brand:'Merrem',                        bpS:2,    bpR:8 },
+  ETP:  { name:'Ertapenem',                class:'Carbapenemi',         brand:'Invanz',                        bpS:0.5,  bpR:1 },
 
   // FLUOROCHINOLONI
-  CIP:  { name:'Ciprofloxacina',           class:'Fluorochinoloni',     brand:'Ciproxin' },
-  LEV:  { name:'Levofloxacina',            class:'Fluorochinoloni',     brand:'Levoxacin, Tavanic' },
-  NOR:  { name:'Norfloxacina',             class:'Fluorochinoloni',     brand:'Noroxin, Norflox' },
-  MOX:  { name:'Moxifloxacina',            class:'Fluorochinoloni',     brand:'Avalox, Octegra' },
-  NAL:  { name:'Acido Nalidixico',         class:'Chinoloni',           brand:'Negram, Nalidix' },
+  CIP:  { name:'Ciprofloxacina',           class:'Fluorochinoloni',     brand:'Ciproxin',                      bpS:0.25, bpR:0.5 },
+  LEV:  { name:'Levofloxacina',            class:'Fluorochinoloni',     brand:'Levoxacin, Tavanic',            bpS:0.5,  bpR:1 },
+  NOR:  { name:'Norfloxacina',             class:'Fluorochinoloni',     brand:'Noroxin, Norflox',              bpS:0.25, bpR:0.5 },
+  MOX:  { name:'Moxifloxacina',            class:'Fluorochinoloni',     brand:'Avalox, Octegra',               bpS:0.25, bpR:0.25 },
+  NAL:  { name:'Acido Nalidixico',         class:'Chinoloni',           brand:'Negram, Nalidix',               bpS:16,   bpR:16 },
 
   // AMINOGLICOSIDI
-  GEN:  { name:'Gentamicina',              class:'Aminoglicosidi',      brand:'Gentalyn, Gentamicina' },
-  TOB:  { name:'Tobramicina',              class:'Aminoglicosidi',      brand:'Nebicina, Bramitob' },
-  AMK:  { name:'Amikacina',                class:'Aminoglicosidi',      brand:'Amikacina, BBK8' },
+  GEN:  { name:'Gentamicina',              class:'Aminoglicosidi',      brand:'Gentalyn, Gentamicina',         bpS:2,    bpR:4 },
+  TOB:  { name:'Tobramicina',              class:'Aminoglicosidi',      brand:'Nebicina, Bramitob',            bpS:2,    bpR:4 },
+  AMK:  { name:'Amikacina',                class:'Aminoglicosidi',      brand:'Amikacina, BBK8',               bpS:8,    bpR:16 },
 
   // MACROLIDI
-  ERY:  { name:'Eritromicina',             class:'Macrolidi',           brand:'Eritrocina, Lauromicina' },
-  AZI:  { name:'Azitromicina',             class:'Macrolidi',           brand:'Zitromax, Azitromicina' },
-  CLA:  { name:'Claritromicina',           class:'Macrolidi',           brand:'Klacid, Macladin' },
+  ERY:  { name:'Eritromicina',             class:'Macrolidi',           brand:'Eritrocina, Lauromicina',       bpS:1,    bpR:2 },
+  AZI:  { name:'Azitromicina',             class:'Macrolidi',           brand:'Zitromax, Azitromicina',        bpS:0.25, bpR:0.5 },
+  CLA:  { name:'Claritromicina',           class:'Macrolidi',           brand:'Klacid, Macladin',              bpS:1,    bpR:2 },
 
   // TETRACICLINE
-  TET:  { name:'Tetraciclina',             class:'Tetracicline',        brand:'Ambramicina' },
-  DOX:  { name:'Doxiciclina',              class:'Tetracicline',        brand:'Bassado, Miraclin' },
-  TGC:  { name:'Tigeciclina',              class:'Glicilcicline',       brand:'Tygacil' },
+  TET:  { name:'Tetraciclina',             class:'Tetracicline',        brand:'Ambramicina',                   bpS:4,    bpR:4 },
+  DOX:  { name:'Doxiciclina',              class:'Tetracicline',        brand:'Bassado, Miraclin',             bpS:1,    bpR:2 },
+  TGC:  { name:'Tigeciclina',              class:'Glicilcicline',       brand:'Tygacil',                       bpS:0.25, bpR:0.5 },
 
   // SULFAMIDICI
-  SXT:  { name:'Trimetoprim/Sulfametoxazolo', class:'Sulfamidici',      brand:'Bactrim, Eusaprim' },
-  TMP:  { name:'Trimetoprim',              class:'Sulfamidici',         brand:'Trimetoprim' },
+  SXT:  { name:'Trimetoprim/Sulfametoxazolo', class:'Sulfamidici',      brand:'Bactrim, Eusaprim',             bpS:2,    bpR:4 },
+  TMP:  { name:'Trimetoprim',              class:'Sulfamidici',         brand:'Trimetoprim',                   bpS:2,    bpR:4 },
 
   // GLICOPEPTIDI
-  VAN:  { name:'Vancomicina',              class:'Glicopeptidi',        brand:'Vancocin, Vancomicina' },
-  TEI:  { name:'Teicoplanina',             class:'Glicopeptidi',        brand:'Targocid, Teicoplanina' },
+  VAN:  { name:'Vancomicina',              class:'Glicopeptidi',        brand:'Vancocin, Vancomicina',         bpS:2,    bpR:2 },
+  TEI:  { name:'Teicoplanina',             class:'Glicopeptidi',        brand:'Targocid, Teicoplanina',        bpS:2,    bpR:2 },
 
   // LINCOSAMIDI
-  CLI:  { name:'Clindamicina',             class:'Lincosamidi',         brand:'Dalacin, Cleocin' },
+  CLI:  { name:'Clindamicina',             class:'Lincosamidi',         brand:'Dalacin, Cleocin',              bpS:0.25, bpR:0.5 },
 
   // OSSAZOLIDINONI
-  LZD:  { name:'Linezolid',                class:'Ossazolidinoni',      brand:'Zyvox, Linezolid' },
+  LZD:  { name:'Linezolid',                class:'Ossazolidinoni',      brand:'Zyvox, Linezolid',              bpS:4,    bpR:4 },
 
   // POLIMIXINE
-  COL:  { name:'Colistina',                class:'Polimixine',          brand:'Colimicina, Colistimetato' },
+  COL:  { name:'Colistina',                class:'Polimixine',          brand:'Colimicina, Colistimetato',     bpS:2,    bpR:2 },
 
   // NITROFURANI
-  NIT:  { name:'Nitrofurantoina',          class:'Nitrofurani',         brand:'Neofuradantin, Furadantin' },
+  NIT:  { name:'Nitrofurantoina',          class:'Nitrofurani',         brand:'Neofuradantin, Furadantin',     bpS:64,   bpR:64 },
 
   // FOSFOMICINA
-  FOS:  { name:'Fosfomicina',              class:'Fosfomicine',         brand:'Monuril, Fosfomicina' },
+  FOS:  { name:'Fosfomicina',              class:'Fosfomicine',         brand:'Monuril, Fosfomicina',          bpS:8,    bpR:8 },
 
   // ANSAMICINE
-  RIF:  { name:'Rifampicina',              class:'Ansamicine',          brand:'Rifadin, Rifinah' },
+  RIF:  { name:'Rifampicina',              class:'Ansamicine',          brand:'Rifadin, Rifinah',              bpS:0.06, bpR:0.5 },
 
   // ALTRI
-  MTZ:  { name:'Metronidazolo',            class:'Nitroimidazoli',      brand:'Flagyl, Deflamon' },
-  DAP:  { name:'Daptomicina',              class:'Lipopeptidi',         brand:'Cubicin' },
-  FDC:  { name:'Acido Fusidico',           class:'Steroidi antibatterici', brand:'Fucidin' },
-  MUP:  { name:'Mupirocina',               class:'Antibiotici topici',  brand:'Bactroban' },
+  MTZ:  { name:'Metronidazolo',            class:'Nitroimidazoli',      brand:'Flagyl, Deflamon',              bpS:4,    bpR:4 },
+  DAP:  { name:'Daptomicina',              class:'Lipopeptidi',         brand:'Cubicin',                       bpS:1,    bpR:1 },
+  FDC:  { name:'Acido Fusidico',           class:'Steroidi antibatterici', brand:'Fucidin',                    bpS:1,    bpR:1 },
+  MUP:  { name:'Mupirocina',               class:'Antibiotici topici',  brand:'Bactroban',                     bpS:1,    bpR:256 },
 };
+
+/* ── Organism-specific Breakpoint Overrides (EUCAST) ── */
+const ORGANISM_BP = {
+  PEN:  { 'staphylococcus': { bpS:0.12, bpR:0.12 }, 'streptococcus pneumoniae': { bpS:0.06, bpR:2 }, 'streptococcus pyogenes': { bpS:0.25, bpR:0.25 } },
+  OXA:  { 'staphylococcus aureus': { bpS:2, bpR:2 }, 'staphylococcus epidermidis': { bpS:0.25, bpR:0.25 } },
+  AMP:  { 'enterococcus': { bpS:4, bpR:8 }, 'haemophilus': { bpS:1, bpR:1 } },
+  AMC:  { 'staphylococcus': { bpS:0.25, bpR:0.25 } },
+  VAN:  { 'enterococcus': { bpS:4, bpR:4 }, 'staphylococcus': { bpS:2, bpR:2 } },
+  TEI:  { 'enterococcus': { bpS:2, bpR:2 }, 'staphylococcus': { bpS:2, bpR:4 } },
+  ERY:  { 'staphylococcus': { bpS:1, bpR:2 }, 'streptococcus': { bpS:0.25, bpR:0.5 } },
+  CLI:  { 'staphylococcus': { bpS:0.25, bpR:0.5 }, 'streptococcus': { bpS:0.5, bpR:0.5 } },
+  TZP:  { 'pseudomonas': { bpS:16, bpR:16 } },
+  CAZ:  { 'pseudomonas': { bpS:8, bpR:8 } },
+  FEP:  { 'pseudomonas': { bpS:8, bpR:8 } },
+  IMP:  { 'pseudomonas': { bpS:4, bpR:4 } },
+  CIP:  { 'pseudomonas': { bpS:0.25, bpR:0.5 }, 'staphylococcus': { bpS:1, bpR:1 } },
+  GEN:  { 'pseudomonas': { bpS:4, bpR:4 }, 'staphylococcus': { bpS:1, bpR:1 } },
+  TOB:  { 'pseudomonas': { bpS:2, bpR:4 }, 'staphylococcus': { bpS:1, bpR:1 } },
+  LZD:  { 'staphylococcus': { bpS:4, bpR:4 }, 'enterococcus': { bpS:4, bpR:4 } },
+  DAP:  { 'staphylococcus': { bpS:1, bpR:1 }, 'enterococcus': { bpS:4, bpR:4 } },
+  RIF:  { 'staphylococcus': { bpS:0.06, bpR:0.5 } },
+  SXT:  { 'staphylococcus': { bpS:2, bpR:4 }, 'streptococcus pneumoniae': { bpS:1, bpR:2 } },
+  NIT:  { 'enterococcus faecalis': { bpS:64, bpR:64 } },
+  COL:  { 'pseudomonas': { bpS:2, bpR:2 }, 'acinetobacter': { bpS:2, bpR:2 } },
+};
+
+/* Helper: get breakpoints for a specific antibiotic + organism */
+function getBreakpoints(abCode, organism) {
+  const ab = ANTIBIOTICS_DB[abCode];
+  if (!ab) return { bpS: null, bpR: null };
+  let bpS = ab.bpS, bpR = ab.bpR;
+  const overrides = ORGANISM_BP[abCode];
+  if (overrides && organism) {
+    const orgLower = organism.toLowerCase();
+    for (const [pattern, bp] of Object.entries(overrides)) {
+      if (orgLower.includes(pattern)) { bpS = bp.bpS; bpR = bp.bpR; break; }
+    }
+  }
+  return { bpS, bpR };
+}
+
+/* Helper: format breakpoint range for display */
+function formatBreakpointRange(bpS, bpR) {
+  if (bpS == null && bpR == null) return '\u2014';
+  if (bpS === bpR) return 'S \u2264' + bpS + ' | R >' + bpS;
+  return 'S \u2264' + bpS + ' | I ' + bpS + '-' + bpR + ' | R >' + bpR;
+}
+
+/* Helper: auto-classify S/I/R from MIC value */
+function autoClassify(micVal, bpS, bpR) {
+  const mic = parseFloat(micVal);
+  if (isNaN(mic) || bpS == null) return '';
+  if (mic <= bpS) return 'S';
+  if (bpS !== bpR && mic <= bpR) return 'I';
+  return 'R';
+}
 
 /* ── Default Panels per Tipo di Campione ── */
 const SAMPLE_PANELS = {
@@ -143,13 +205,13 @@ const SAMPLE_PANELS = {
 
 /* ── Preset Cards ── */
 const PRESETS = [
-  { id:'urine',       name:'Urinocoltura',        icon:'🧪', desc:'IVU, cistiti, pielonefriti', color:'#2d5a3d' },
-  { id:'feci',        name:'Coprocoltura',         icon:'🔬', desc:'Salmonella, Shigella, Campylobacter', color:'#8b6914' },
-  { id:'orofaringeo', name:'Tampone Orofaringeo',  icon:'👅', desc:'Streptococco, Stafilococco', color:'#c4563a' },
-  { id:'ferita',      name:'Tampone Ferita',       icon:'🩹', desc:'Infezioni cute e tessuti molli', color:'#6b3fa0' },
-  { id:'espettorato', name:'Espettorato',          icon:'🫁', desc:'Infezioni respiratorie basse', color:'#1a6b7a' },
-  { id:'vaginale',    name:'Tampone Vaginale',     icon:'🔎', desc:'Infezioni vaginali, GBS', color:'#a0527a' },
-  { id:'sangue',      name:'Emocoltura',           icon:'🩸', desc:'Batteriemia, sepsi', color:'#b82020' },
-  { id:'liquor',      name:'Liquor',               icon:'🧠', desc:'Meningiti, encefaliti', color:'#3a5fc4' },
-  { id:'generico',    name:'Altro Materiale',      icon:'📋', desc:'Pannello generico personalizzabile', color:'#555' },
+  { id:'urine',       name:'Urinocoltura',        icon:'U',  desc:'IVU, cistiti, pielonefriti', color:'#2d5a3d' },
+  { id:'feci',        name:'Coprocoltura',         icon:'C',  desc:'Salmonella, Shigella, Campylobacter', color:'#8b6914' },
+  { id:'orofaringeo', name:'Tampone Orofaringeo',  icon:'O',  desc:'Streptococco, Stafilococco', color:'#c4563a' },
+  { id:'ferita',      name:'Tampone Ferita',       icon:'F',  desc:'Infezioni cute e tessuti molli', color:'#6b3fa0' },
+  { id:'espettorato', name:'Espettorato',          icon:'E',  desc:'Infezioni respiratorie basse', color:'#1a6b7a' },
+  { id:'vaginale',    name:'Tampone Vaginale',     icon:'V',  desc:'Infezioni vaginali, GBS', color:'#a0527a' },
+  { id:'sangue',      name:'Emocoltura',           icon:'S',  desc:'Batteriemia, sepsi', color:'#b82020' },
+  { id:'liquor',      name:'Liquor',               icon:'L',  desc:'Meningiti, encefaliti', color:'#3a5fc4' },
+  { id:'generico',    name:'Altro Materiale',      icon:'A',  desc:'Pannello generico personalizzabile', color:'#555' },
 ];

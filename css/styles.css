@@ -53,9 +53,11 @@ textarea { resize: vertical; min-height: 60px; }
 .preset-card { padding: 14px; border-radius: 10px; border: 2px solid var(--border-light); cursor: pointer; text-align: center; transition: all .2s; }
 .preset-card:hover { border-color: var(--preset-color, var(--primary)); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
 .preset-card.selected { border-color: var(--preset-color, var(--primary)); background: color-mix(in srgb, var(--preset-color, var(--primary)) 8%, white); }
-.preset-icon { font-size: 28px; margin-bottom: 6px; }
+.preset-icon-letter { width: 36px; height: 36px; border-radius: 50%; color: #fff; font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-family: 'Source Serif 4', serif; }
 .preset-name { font-weight: 600; font-size: 13px; }
 .preset-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.sci-notation { font-family: 'DM Sans', monospace; font-weight: 600; color: var(--primary); font-size: 13px; }
+.sci-notation sup { font-size: 9px; }
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 8px; font: 500 14px 'DM Sans'; cursor: pointer; transition: all .2s; }
@@ -95,6 +97,9 @@ textarea { resize: vertical; min-height: 60px; }
 .ab-name { font-weight: 600; font-size: 13px; }
 .ab-brand { font-size: 11px; color: var(--text-muted); }
 .ab-code-cell { color: var(--text-muted); font-size: 11px; font-family: monospace; }
+.bp-cell { min-width: 120px; }
+.bp-text { font-size: 10px; font-family: monospace; color: var(--text-secondary); background: var(--surface-alt); padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+.bp-cell-result { font-size: 11px; font-family: monospace; color: var(--text-secondary); }
 .mic-input { width: 80px; padding: 5px 8px !important; font-size: 13px !important; text-align: center; }
 .sir-select { width: 60px; padding: 5px 6px !important; font-size: 13px !important; font-weight: 600; text-align: center; }
 .sir-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
@@ -156,6 +161,7 @@ textarea { resize: vertical; min-height: 60px; }
 .rec-brand { font-size: 12px; color: var(--success); margin-top: 2px; }
 .rec-class { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .rec-mic { font-size: 11px; color: var(--text-secondary); font-family: monospace; margin-top: 4px; }
+.rec-bp { font-size: 10px; color: var(--text-muted); font-family: monospace; margin-top: 2px; }
 .first-choice-card { background: var(--primary); color: #fff; padding: 14px 18px; border-radius: 10px; display: inline-block; }
 .fc-name { font-weight: 700; font-size: 16px; }
 .fc-brand { font-size: 13px; opacity: .9; margin-top: 2px; }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Refertazione Antibiogramma MIC</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect x='2' y='2' width='32' height='32' rx='8' fill='%232d5a3d'/><text x='18' y='24' font-size='20' text-anchor='middle' fill='white'>🧫</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect x='2' y='2' width='32' height='32' rx='8' fill='%232d5a3d'/><text x='18' y='24' font-size='18' text-anchor='middle' fill='white'>AB</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -28,18 +28,18 @@
 
 <div class="container">
   <div class="section-tabs">
-    <button class="section-tab active" onclick="showSection('setup')">① Configurazione</button>
-    <button class="section-tab" onclick="showSection('data')">② Antibiogramma</button>
-    <button class="section-tab" onclick="showSection('results')">③ Risultati</button>
-    <button class="section-tab" onclick="showSection('pdf')">④ Genera PDF</button>
-    <button class="section-tab" onclick="showSection('archive')">⑤ Archivio</button>
+    <button class="section-tab active" onclick="showSection('setup')">1. Configurazione</button>
+    <button class="section-tab" onclick="showSection('data')">2. Antibiogramma</button>
+    <button class="section-tab" onclick="showSection('results')">3. Risultati</button>
+    <button class="section-tab" onclick="showSection('pdf')">4. Genera PDF</button>
+    <button class="section-tab" onclick="showSection('archive')">5. Archivio</button>
   </div>
 
-  <!-- ═══════ SETUP ═══════ -->
+  <!-- SETUP -->
   <div id="section-setup" class="fade-in">
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">👤</div>
+        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">P</div>
         <h2>Dati Paziente</h2>
       </div>
       <div class="card-body">
@@ -53,14 +53,14 @@
           <div class="form-group"><label>Codice Fiscale</label><input type="text" id="pt-cf" placeholder="RSSMRA80A01H501Z" style="text-transform:uppercase"></div>
           <div class="form-group"><label>Data Esame</label><input type="date" id="pt-data-esame"></div>
           <div class="form-group"><label>Medico Richiedente</label><input type="text" id="pt-medico" placeholder="Dott. ..."></div>
-          <div class="form-group"><label>N° Accettazione</label><input type="text" id="pt-accettazione" placeholder="ACC-2026-001"></div>
+          <div class="form-group"><label>N. Accettazione</label><input type="text" id="pt-accettazione" placeholder="ACC-2026-001"></div>
         </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--accent-pale);color:var(--accent)">🧫</div>
+        <div class="icon" style="background:var(--accent-pale);color:var(--accent)">C</div>
         <h2>Tipo di Campione</h2>
       </div>
       <div class="card-body">
@@ -70,55 +70,57 @@
 
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:#e8e0f0;color:#6b3fa0">🦠</div>
+        <div class="icon" style="background:#e8e0f0;color:#6b3fa0">M</div>
         <h2>Microrganismo Isolato</h2>
       </div>
       <div class="card-body">
         <div class="grid-3">
           <div class="form-group">
             <label>Campione</label>
-            <div id="cfg-sample-label" style="font-weight:600;font-size:14px;padding:8px 0;color:var(--primary)">— Seleziona tipo sopra —</div>
+            <div id="cfg-sample-label" style="font-weight:600;font-size:14px;padding:8px 0;color:var(--primary)">-- Seleziona tipo sopra --</div>
           </div>
           <div class="form-group">
             <label>Microrganismo</label>
             <select id="cfg-organism" onchange="onOrganismChange()">
-              <option value="">— Seleziona campione prima —</option>
+              <option value="">-- Seleziona campione prima --</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Carica (UFC/mL)</label>
-            <input type="text" id="cfg-colony-count" placeholder="es. >100.000 UFC/mL" oninput="updateColonyCount()">
+            <label>Carica batterica</label>
+            <input type="text" id="cfg-colony-count" placeholder="es. >100000 o 1e5 o 10^5" oninput="updateColonyCount()">
+            <div id="colony-sci-display" class="hidden" style="margin-top:4px"></div>
           </div>
         </div>
         <div id="custom-organism-row" class="hidden" style="margin-top:12px">
           <div class="grid-2">
             <div class="form-group"><label>Nome microrganismo (manuale)</label><input type="text" id="cfg-organism-custom" placeholder="Es. Mycobacterium tuberculosis"></div>
-            <div style="display:flex;align-items:flex-end"><button class="btn btn-primary btn-sm" onclick="applyCustomOrganism()">✓ Conferma</button></div>
+            <div style="display:flex;align-items:flex-end"><button class="btn btn-primary btn-sm" onclick="applyCustomOrganism()">Conferma</button></div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="actions-bar">
-      <button class="btn btn-primary btn-lg" onclick="proceedToData()">Prosegui all'antibiogramma →</button>
+      <button class="btn btn-primary btn-lg" onclick="proceedToData()">Prosegui all'antibiogramma &rarr;</button>
     </div>
   </div>
 
-  <!-- ═══════ DATA ENTRY ═══════ -->
+  <!-- DATA ENTRY -->
   <div id="section-data" class="hidden fade-in">
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">🔬</div>
-        <h2>Antibiogramma — <span id="data-title"></span></h2>
+        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">AB</div>
+        <h2>Antibiogramma &mdash; <span id="data-title"></span></h2>
       </div>
       <div class="card-body">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
           <div id="ab-count"></div>
           <button class="btn btn-primary btn-sm" onclick="showAddAntibioticModal()">+ Aggiungi Antibiotico</button>
         </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Inserendo il valore MIC, la classificazione S/I/R viene compilata automaticamente in base ai breakpoint EUCAST. E possibile modificarla manualmente.</p>
         <div class="data-table-wrap">
           <table id="abg-table">
-            <thead><tr><th>Antibiotico</th><th>Codice</th><th>MIC (µg/mL)</th><th>S/I/R</th><th>Stato</th><th></th></tr></thead>
+            <thead><tr><th>Antibiotico</th><th>Codice</th><th>Breakpoint EUCAST (mg/L)</th><th>MIC (ug/mL)</th><th>S/I/R</th><th>Stato</th><th></th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -127,22 +129,22 @@
           <label>Metodica / Note Tecniche</label>
           <textarea id="methodology" class="methodology-input" placeholder="Metodica...">Identificazione: spettrometria di massa MALDI-TOF
 Antibiogramma: microdiluizione in brodo (MIC) - sistema automatizzato
-Breakpoints: EUCAST (edizione corrente)
-Interpretazione: S = Sensibile, I = Sensibilità intermedia (efficace a dosaggio aumentato), R = Resistente</textarea>
+Breakpoints: EUCAST v15.0 (2025)
+Interpretazione: S = Sensibile, I = Sensibilita intermedia (efficace a dosaggio aumentato), R = Resistente</textarea>
         </div>
       </div>
     </div>
     <div class="actions-bar">
-      <button class="btn btn-outline" onclick="showSection('setup')">← Configurazione</button>
-      <button class="btn btn-primary btn-lg" onclick="proceedToResults()">Visualizza Risultati →</button>
+      <button class="btn btn-outline" onclick="showSection('setup')">&larr; Configurazione</button>
+      <button class="btn btn-primary btn-lg" onclick="proceedToResults()">Visualizza Risultati &rarr;</button>
     </div>
   </div>
 
-  <!-- ═══════ RESULTS ═══════ -->
+  <!-- RESULTS -->
   <div id="section-results" class="hidden fade-in">
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--success-pale);color:var(--success)">📊</div>
+        <div class="icon" style="background:var(--success-pale);color:var(--success)">G</div>
         <h2>Profilo di Resistenza</h2>
       </div>
       <div class="card-body">
@@ -154,7 +156,7 @@ Interpretazione: S = Sensibile, I = Sensibilità intermedia (efficace a dosaggio
     </div>
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">📋</div>
+        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">R</div>
         <h2>Riepilogo e Interpretazione</h2>
       </div>
       <div class="card-body">
@@ -166,25 +168,25 @@ Interpretazione: S = Sensibile, I = Sensibilità intermedia (efficace a dosaggio
       </div>
     </div>
     <div class="actions-bar">
-      <button class="btn btn-outline" onclick="showSection('data')">← Modifica dati</button>
-      <button class="btn btn-primary btn-lg" onclick="showSection('pdf')">Prepara PDF →</button>
+      <button class="btn btn-outline" onclick="showSection('data')">&larr; Modifica dati</button>
+      <button class="btn btn-primary btn-lg" onclick="showSection('pdf')">Prepara PDF &rarr;</button>
     </div>
   </div>
 
-  <!-- ═══════ PDF ═══════ -->
+  <!-- PDF -->
   <div id="section-pdf" class="hidden fade-in">
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--accent-pale);color:var(--accent)">🖼️</div>
+        <div class="icon" style="background:var(--accent-pale);color:var(--accent)">H</div>
         <h2>Intestazione (Logo / Header)</h2>
       </div>
       <div class="card-body">
         <div class="header-upload" id="header-upload-area" onclick="document.getElementById('header-file').click()">
           <input type="file" id="header-file" accept="image/*" style="display:none" onchange="handleHeaderUpload(event)">
           <div id="upload-placeholder">
-            <div style="font-size:28px;margin-bottom:8px">📤</div>
+            <div style="font-size:24px;margin-bottom:8px;color:var(--text-muted)">[Carica immagine]</div>
             <div style="font-weight:500;color:var(--text-secondary)">Clicca per caricare intestazione</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:4px">JPG, PNG — 800×120 px consigliato</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px">JPG, PNG &mdash; 800x120 px consigliato</div>
           </div>
           <img id="header-preview" class="hidden">
         </div>
@@ -200,7 +202,7 @@ Interpretazione: S = Sensibile, I = Sensibilità intermedia (efficace a dosaggio
     </div>
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">📄</div>
+        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">PDF</div>
         <h2>Genera PDF</h2>
       </div>
       <div class="card-body">
@@ -218,38 +220,35 @@ Interpretazione: S = Sensibile, I = Sensibilità intermedia (efficace a dosaggio
         </div>
         <div id="lib-status" style="margin-top:12px"></div>
         <div class="actions-bar" style="justify-content:center;flex-direction:column;align-items:center;gap:12px;padding-top:24px">
-          <button class="btn btn-accent btn-lg" id="btn-gen-pdf" onclick="generatePDF()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            Genera PDF
-          </button>
-          <button class="btn btn-outline btn-sm" onclick="downloadHTML()">💾 Scarica app HTML (uso offline)</button>
+          <button class="btn btn-accent btn-lg" id="btn-gen-pdf" onclick="generatePDF()">Genera PDF</button>
+          <button class="btn btn-outline btn-sm" onclick="downloadHTML()">Scarica app HTML (uso offline)</button>
         </div>
         <div id="pdf-preview" class="hidden" style="margin-top:16px"></div>
       </div>
     </div>
-    <div class="actions-bar"><button class="btn btn-outline" onclick="showSection('results')">← Risultati</button></div>
+    <div class="actions-bar"><button class="btn btn-outline" onclick="showSection('results')">&larr; Risultati</button></div>
   </div>
 
-  <!-- ═══════ ARCHIVE ═══════ -->
+  <!-- ARCHIVE -->
   <div id="section-archive" class="hidden fade-in">
     <div class="card">
       <div class="card-header">
-        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">🗃️</div>
+        <div class="icon" style="background:var(--primary-pale);color:var(--primary)">DB</div>
         <h2>Archivio Pazienti e Referti</h2>
       </div>
       <div class="card-body">
         <div id="archive-stats" class="db-stats"></div>
         <input type="text" class="db-search" id="archive-search" placeholder="Cerca per nome, CF, microrganismo, data..." oninput="renderArchive()">
         <div style="margin:12px 0;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-outline btn-sm" onclick="exportArchive()">📥 Esporta (JSON)</button>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('import-file').click()">📤 Importa</button>
+          <button class="btn btn-outline btn-sm" onclick="exportArchive()">Esporta (JSON)</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('import-file').click()">Importa</button>
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="importArchive(event)">
-          <button class="btn btn-danger-outline btn-sm" onclick="clearArchive()">🗑️ Svuota</button>
+          <button class="btn btn-danger-outline btn-sm" onclick="clearArchive()">Svuota</button>
         </div>
         <div id="archive-list" class="db-list"></div>
       </div>
     </div>
-    <div class="actions-bar"><button class="btn btn-primary btn-lg" onclick="showSection('setup')">← Nuovo referto</button></div>
+    <div class="actions-bar"><button class="btn btn-primary btn-lg" onclick="showSection('setup')">&larr; Nuovo referto</button></div>
   </div>
 </div>
 
@@ -258,7 +257,7 @@ Interpretazione: S = Sensibile, I = Sensibilità intermedia (efficace a dosaggio
   <div class="modal-content">
     <div class="modal-header">
       <h3>Aggiungi Antibiotico al Pannello</h3>
-      <button class="modal-close" onclick="hideAddAntibioticModal()">✕</button>
+      <button class="modal-close" onclick="hideAddAntibioticModal()">X</button>
     </div>
     <div class="modal-body">
       <input type="text" id="ab-search" placeholder="Cerca antibiotico, classe, nome commerciale..." oninput="renderAvailableAntibiotics()">
