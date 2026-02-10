@@ -16,7 +16,7 @@ function renderResultsSummary() {
   // Header info
   const colonyDisplay = getColonyDisplay();
   html += `<div class="result-header">
-    <div class="result-field"><span class="result-label">Campione:</span> ${SAMPLE_PANELS[state.sampleType]?.label || state.sampleType}</div>
+    <div class="result-field"><span class="result-label">Campione:</span> ${getSampleLabel()}</div>
     <div class="result-field"><span class="result-label">Microrganismo isolato:</span> <strong>${state.organism}</strong></div>
     ${colonyDisplay ? `<div class="result-field"><span class="result-label">Carica:</span> ${colonyDisplay}</div>` : ''}
     <div class="result-field"><span class="result-label">Antibiotici testati:</span> ${total}</div>
@@ -81,7 +81,7 @@ function buildInterpretation(sensible, intermediate, resistant) {
   const colonyDisplay = getColonyDisplay();
   html += `<p class="interp-text"><strong>Microrganismo isolato:</strong> <em>${state.organism}</em><br>`;
   if (colonyDisplay) html += `<strong>Carica microbica:</strong> ${colonyDisplay}<br>`;
-  html += `<strong>Campione:</strong> ${SAMPLE_PANELS[state.sampleType]?.label || state.sampleType}</p>`;
+  html += `<strong>Campione:</strong> ${getSampleLabel()}</p>`;
 
   if (sensible.length > 0) {
     html += '<h4 class="interp-subtitle">Antibiotici Consigliati (Sensibili)</h4>';
@@ -104,7 +104,7 @@ function buildInterpretation(sensible, intermediate, resistant) {
     html += '<h4 class="interp-subtitle">Prima Scelta Consigliata</h4>';
     const firstChoice = pickFirstChoice(sensible);
     if (firstChoice) {
-      html += `<p class="interp-text">In base al profilo di sensibilita e al tipo di campione (${SAMPLE_PANELS[state.sampleType]?.label || ''}), si suggerisce come prima scelta:</p>`;
+      html += `<p class="interp-text">In base al profilo di sensibilita e al tipo di campione (${getSampleLabel()}), si suggerisce come prima scelta:</p>`;
       html += `<div class="first-choice-card">
         <div class="fc-name">${firstChoice.name}</div>
         <div class="fc-brand">${firstChoice.brand}</div>
@@ -147,6 +147,7 @@ function pickFirstChoice(sensible) {
     ferita: ['AMC','CXM','SXT','CLI','DOX','CIP','LEV'],
     espettorato: ['AMC','AZI','CLA','LEV','MOX','CXM','CTX'],
     vaginale: ['AMX','AMC','AZI','CLI','MTZ','NIT','CTX'],
+    oculare: ['MOX','LEV','CIP','TOB','GEN','AZI','ERY','CXM','AMC'],
     sangue: ['CTX','CRO','TZP','MEM','VAN','DAP'],
     liquor: ['CTX','CRO','AMP','MEM','VAN'],
     generico: ['AMC','CIP','SXT','CTX'],

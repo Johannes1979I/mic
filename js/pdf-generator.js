@@ -19,7 +19,7 @@ async function generatePDF() {
     // Header image
     const headerImg = document.getElementById('header-preview');
     if (headerImg && !headerImg.classList.contains('hidden') && headerImg.src) {
-      try { doc.addImage(headerImg.src, 'PNG', mx, y, cw, 18); y += 20; }
+      try { doc.addImage(headerImg.src, 'PNG', mx, y, cw, 18); y += 22; }
       catch(e) { /* skip */ }
     }
 
@@ -27,7 +27,7 @@ async function generatePDF() {
     const title = document.getElementById('pdf-title').value || 'Referto Esame Microbiologico con Antibiogramma';
     doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
     doc.setTextColor(45, 90, 61);
-    doc.text(title, pw / 2, y, { align: 'center' }); y += 6;
+    doc.text(title, pw / 2, y, { align: 'center' }); y += 7;
 
     // Separator
     doc.setDrawColor(45, 90, 61); doc.setLineWidth(0.5);
@@ -64,7 +64,7 @@ async function generatePDF() {
     doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(45, 90, 61);
     doc.text('Campione: ', mx + 3, y + 4);
     doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 30, 30);
-    doc.text(SAMPLE_PANELS[state.sampleType]?.label || state.sampleType, mx + 22, y + 4);
+    doc.text(getSampleLabel(), mx + 22, y + 4);
     doc.setFont('helvetica', 'bold'); doc.setTextColor(45, 90, 61);
     doc.text('Microrganismo isolato: ', mx + 3, y + 8);
     doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 30, 30);

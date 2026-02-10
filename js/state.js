@@ -196,12 +196,28 @@ const SAMPLE_PANELS = {
     antibiotics: ['PEN','AMP','CTX','CRO','MEM','CIP','LEV','VAN','LZD','GEN','AMK','SXT','RIF','CLI','CXM'],
     organisms: ['Neisseria meningitidis','Streptococcus pneumoniae','Haemophilus influenzae','Listeria monocytogenes','Escherichia coli','Staphylococcus aureus','Streptococcus agalactiae (Gruppo B)','Enterococcus faecalis','Cryptococcus neoformans'],
   },
+  oculare: {
+    label: 'Tampone Oculare',
+    antibiotics: ['AMC','AMP','CXM','CTX','CRO','CFX','CIP','LEV','MOX','NOR','GEN','TOB','AMK','ERY','AZI','CLA','CLI','SXT','OXA','VAN','TEI','FDC','RIF','DOX','TET'],
+    organisms: ['Staphylococcus aureus','Staphylococcus aureus (MRSA)','Staphylococcus epidermidis','Streptococcus pneumoniae','Streptococcus pyogenes (Gruppo A)','Haemophilus influenzae','Moraxella catarrhalis','Pseudomonas aeruginosa','Neisseria gonorrhoeae','Chlamydia trachomatis','Serratia marcescens','Enterobacter cloacae','Escherichia coli','Corynebacterium spp.','Candida albicans'],
+  },
   generico: {
     label: 'Altro Materiale',
     antibiotics: ['AMP','AMX','AMC','OXA','TZP','CXM','CTX','CRO','CAZ','FEP','IMP','MEM','ETP','CIP','LEV','GEN','TOB','AMK','ERY','AZI','CLA','CLI','VAN','TEI','LZD','SXT','NIT','FOS','COL','RIF','DOX','MTZ'],
     organisms: ['Staphylococcus aureus','Escherichia coli','Klebsiella pneumoniae','Pseudomonas aeruginosa','Enterococcus faecalis','Streptococcus pyogenes (Gruppo A)','Proteus mirabilis','Acinetobacter baumannii','Altro (specificare)'],
   },
 };
+
+/* ── Custom Antibiotic Panels (user-created, saved in localStorage) ──
+   Format: { id, name, antibiotics: [codes], associatedExams: [preset ids] }
+*/
+function getCustomPanels() {
+  try { const r = localStorage.getItem('abg_custom_panels'); return r ? JSON.parse(r) : []; }
+  catch(e) { return []; }
+}
+function saveCustomPanels(panels) {
+  try { localStorage.setItem('abg_custom_panels', JSON.stringify(panels)); } catch(e) {}
+}
 
 /* ── Preset Cards ── */
 const PRESETS = [
@@ -211,6 +227,7 @@ const PRESETS = [
   { id:'ferita',      name:'Tampone Ferita',       icon:'F',  desc:'Infezioni cute e tessuti molli', color:'#6b3fa0' },
   { id:'espettorato', name:'Espettorato',          icon:'E',  desc:'Infezioni respiratorie basse', color:'#1a6b7a' },
   { id:'vaginale',    name:'Tampone Vaginale',     icon:'V',  desc:'Infezioni vaginali, GBS', color:'#a0527a' },
+  { id:'oculare',     name:'Tampone Oculare',      icon:'Oc', desc:'Congiuntiviti, cheratiti, dacriocistiti', color:'#2980b9' },
   { id:'sangue',      name:'Emocoltura',           icon:'S',  desc:'Batteriemia, sepsi', color:'#b82020' },
   { id:'liquor',      name:'Liquor',               icon:'L',  desc:'Meningiti, encefaliti', color:'#3a5fc4' },
   { id:'generico',    name:'Altro Materiale',      icon:'A',  desc:'Pannello generico personalizzabile', color:'#555' },

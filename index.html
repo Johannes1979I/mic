@@ -65,6 +65,15 @@
       </div>
       <div class="card-body">
         <div class="preset-grid" id="preset-grid"></div>
+        <!-- Custom sample label for "Altro Materiale" -->
+        <div id="custom-sample-label-row" class="custom-sample-row hidden">
+          <label style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px">Specifica tipo di campione</label>
+          <input type="text" id="custom-sample-label" placeholder="Es. Tampone auricolare, Liquido pleurico, Aspirato bronchiale..." oninput="onCustomSampleLabelChange()">
+        </div>
+        <!-- Custom panels management -->
+        <div style="margin-top:14px;display:flex;justify-content:flex-end">
+          <button class="btn btn-outline btn-sm" onclick="showCustomPanelsModal()">Gestisci Pannelli Antibiotici Personalizzati</button>
+        </div>
       </div>
     </div>
 
@@ -274,6 +283,56 @@ Interpretazione: S = Sensibile, I = Sensibilita intermedia (efficace a dosaggio 
   </div>
 </div>
 
+<!-- Custom Panels Modal -->
+<div id="custom-panels-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideCustomPanelsModal()">
+  <div class="modal-content" style="max-width:720px">
+    <div class="modal-header">
+      <h3>Pannelli Antibiotici Personalizzati</h3>
+      <button class="modal-close" onclick="hideCustomPanelsModal()">X</button>
+    </div>
+    <div class="modal-body">
+      <!-- LIST VIEW -->
+      <div id="cp-list-section">
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Crea pannelli aggiuntivi di antibiotici e associali a uno o piu tipi di esame. Quando scegli un esame, i pannelli associati verranno aggiunti automaticamente al pannello di default.</p>
+        <div id="custom-panels-list"></div>
+        <div style="margin-top:14px;text-align:center">
+          <button class="btn btn-primary" onclick="showNewPanelForm()">+ Nuovo Pannello</button>
+        </div>
+      </div>
+
+      <!-- FORM VIEW -->
+      <div id="cp-form-section" class="hidden">
+        <h4 id="cp-form-title" style="font-size:15px;font-weight:700;margin-bottom:12px">Nuovo Pannello Antibiotici</h4>
+
+        <div class="cp-form-group">
+          <label>Nome del pannello</label>
+          <input type="text" id="cp-panel-name" placeholder="Es. Panel MDR, Panel Gram+, ecc.">
+        </div>
+
+        <div class="cp-form-group">
+          <label>Associa a questi tipi di esame</label>
+          <div id="cp-exam-checkboxes" style="display:flex;flex-wrap:wrap;gap:2px"></div>
+        </div>
+
+        <div class="cp-form-group">
+          <label>Seleziona antibiotici</label>
+          <input type="text" id="cp-ab-search" placeholder="Cerca antibiotico..." oninput="filterPanelAntibiotics()" style="margin-bottom:6px">
+          <div class="cp-btn-bar">
+            <button class="btn btn-outline btn-sm" onclick="cpSelectAllAbs(true)">Seleziona tutti</button>
+            <button class="btn btn-outline btn-sm" onclick="cpSelectAllAbs(false)">Deseleziona tutti</button>
+          </div>
+          <div id="cp-ab-checkboxes" class="cp-scrollable"></div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+          <button class="btn btn-outline" onclick="cancelPanelForm()">Annulla</button>
+          <button class="btn btn-primary" onclick="savePanelForm()">Salva Pannello</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Hidden canvas for PDF chart -->
 <canvas id="pdfChartCanvas" style="display:none" width="440" height="440"></canvas>
 
@@ -285,6 +344,7 @@ Interpretazione: S = Sensibile, I = Sensibilita intermedia (efficace a dosaggio 
 <script src="js/data-entry.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/results.js"></script>
+<script src="js/custom-panels.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/database.js"></script>
 <script src="js/pdf-generator.js"></script>

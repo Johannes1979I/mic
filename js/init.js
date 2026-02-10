@@ -39,4 +39,5 @@ init();
 window.addEventListener('load', function() {
   setTimeout(checkLibraries, 1500);
   loadSettingsFromStorage();
+  buildCustomPanelFormContent();
 });

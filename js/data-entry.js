@@ -3,7 +3,7 @@
 function renderDataTable() {
   const tbody = document.querySelector('#abg-table tbody');
   const title = document.getElementById('data-title');
-  title.textContent = (SAMPLE_PANELS[state.sampleType]?.label || 'Esame') + ' -- ' + state.organism;
+  title.textContent = (typeof getSampleLabel === 'function' ? getSampleLabel() : 'Esame') + ' -- ' + state.organism;
 
   // Group by class
   const grouped = {};
