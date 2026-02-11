@@ -53,6 +53,20 @@ function renderResultsSummary() {
   // Interpretation
   html += buildInterpretation(sensible, intermediate, resistant);
 
+  // Screened species (for panels that have them, e.g. genitale, uretrale)
+  const panel = SAMPLE_PANELS[state.sampleType];
+  if (panel && panel.screenedSpecies) {
+    html += '<div class="screened-species-box">';
+    html += '<h3 class="section-subtitle" style="color:var(--primary)">Specie Ricercate (A.F. Genital System — Liofilchem ref. 74156)</h3>';
+    html += '<table class="result-table"><thead><tr><th>Specie</th><th>Metodo</th><th>Esito</th></tr></thead><tbody>';
+    panel.screenedSpecies.forEach(sp => {
+      const isIsolated = state.organism && state.organism.toLowerCase().includes(sp.name.split(' ')[0].toLowerCase());
+      const badge = isIsolated ? '<span class="sir-badge badge-r">ISOLATO</span>' : '<span class="sir-badge badge-s">Negativo</span>';
+      html += `<tr><td><em>${sp.name}</em></td><td>${sp.method}</td><td>${badge}</td></tr>`;
+    });
+    html += '</tbody></table></div>';
+  }
+
   el.innerHTML = html;
 }
 
@@ -146,7 +160,8 @@ function pickFirstChoice(sensible) {
     orofaringeo: ['AMX','AMC','AZI','CLA','PEN','CXM','LEV'],
     ferita: ['AMC','CXM','SXT','CLI','DOX','CIP','LEV'],
     espettorato: ['AMC','AZI','CLA','LEV','MOX','CXM','CTX'],
-    vaginale: ['AMX','AMC','AZI','CLI','MTZ','NIT','CTX'],
+    genitale: ['DOX','AZI','CLA','CLI','OFX','ERY','AMC','CTX'],
+    uretrale: ['DOX','AZI','CLA','CLI','OFX','ERY','AMC','CTX'],
     oculare: ['MOX','LEV','CIP','TOB','GEN','AZI','ERY','CXM','AMC'],
     sangue: ['CTX','CRO','TZP','MEM','VAN','DAP'],
     liquor: ['CTX','CRO','AMP','MEM','VAN'],

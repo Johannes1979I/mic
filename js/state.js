@@ -3,6 +3,7 @@
 const state = {
   preset: null,
   sampleType: '',
+  genitaleSite: '',
   organism: '',
   colonyCount: '',
   colonyCountExp: '',
@@ -49,6 +50,8 @@ const ANTIBIOTICS_DB = {
   NOR:  { name:'Norfloxacina',             class:'Fluorochinoloni',     brand:'Noroxin, Norflox',              bpS:0.25, bpR:0.5 },
   MOX:  { name:'Moxifloxacina',            class:'Fluorochinoloni',     brand:'Avalox, Octegra',               bpS:0.25, bpR:0.25 },
   NAL:  { name:'Acido Nalidixico',         class:'Chinoloni',           brand:'Negram, Nalidix',               bpS:16,   bpR:16 },
+  OFX:  { name:'Ofloxacina',              class:'Fluorochinoloni',     brand:'Oflocin, Exocin',               bpS:0.25, bpR:0.5 },
+  PEF:  { name:'Pefloxacina',             class:'Fluorochinoloni',     brand:'Peflacin, Peflox',              bpS:1,    bpR:4 },
 
   // AMINOGLICOSIDI
   GEN:  { name:'Gentamicina',              class:'Aminoglicosidi',      brand:'Gentalyn, Gentamicina',         bpS:2,    bpR:4 },
@@ -59,10 +62,12 @@ const ANTIBIOTICS_DB = {
   ERY:  { name:'Eritromicina',             class:'Macrolidi',           brand:'Eritrocina, Lauromicina',       bpS:1,    bpR:2 },
   AZI:  { name:'Azitromicina',             class:'Macrolidi',           brand:'Zitromax, Azitromicina',        bpS:0.25, bpR:0.5 },
   CLA:  { name:'Claritromicina',           class:'Macrolidi',           brand:'Klacid, Macladin',              bpS:1,    bpR:2 },
+  JOS:  { name:'Josamicina',              class:'Macrolidi',           brand:'Josacine, Josamicina',          bpS:2,    bpR:8 },
 
   // TETRACICLINE
   TET:  { name:'Tetraciclina',             class:'Tetracicline',        brand:'Ambramicina',                   bpS:4,    bpR:4 },
   DOX:  { name:'Doxiciclina',              class:'Tetracicline',        brand:'Bassado, Miraclin',             bpS:1,    bpR:2 },
+  MIN:  { name:'Minociclina',             class:'Tetracicline',        brand:'Minocin, Minociclina',          bpS:4,    bpR:8 },
   TGC:  { name:'Tigeciclina',              class:'Glicilcicline',       brand:'Tygacil',                       bpS:0.25, bpR:0.5 },
 
   // SULFAMIDICI
@@ -181,10 +186,44 @@ const SAMPLE_PANELS = {
     antibiotics: ['AMP','AMC','TZP','CXM','CTX','CRO','CAZ','FEP','IMP','MEM','ETP','CIP','LEV','MOX','GEN','TOB','AMK','ERY','AZI','CLA','SXT','CLI','VAN','LZD','COL','OXA','RIF'],
     organisms: ['Streptococcus pneumoniae','Haemophilus influenzae','Moraxella catarrhalis','Staphylococcus aureus','Staphylococcus aureus (MRSA)','Pseudomonas aeruginosa','Klebsiella pneumoniae','Escherichia coli','Enterobacter cloacae','Acinetobacter baumannii','Stenotrophomonas maltophilia','Serratia marcescens','Mycobacterium tuberculosis'],
   },
-  vaginale: {
-    label: 'Tampone Vaginale',
-    antibiotics: ['PEN','AMP','AMX','AMC','CXM','CTX','CRO','ERY','AZI','CLA','CLI','VAN','TEI','LZD','GEN','CIP','LEV','NIT','SXT','MTZ','DOX','TET','RIF'],
-    organisms: ['Streptococcus agalactiae (Gruppo B)','Escherichia coli','Gardnerella vaginalis','Candida albicans','Candida glabrata','Staphylococcus aureus','Enterococcus faecalis','Lactobacillus spp.','Ureaplasma urealyticum','Mycoplasma hominis','Trichomonas vaginalis','Neisseria gonorrhoeae','Chlamydia trachomatis'],
+  genitale: {
+    label: 'Tampone Genitale',
+    subSites: ['Vaginale', 'Cervicale', 'Vaginale + Cervicale', 'Uretrale', 'Prepuziale', 'Glande', 'Altra sede genitale'],
+    antibiotics: ['PEN','AMP','AMX','AMC','CXM','CTX','CRO','ERY','AZI','CLA','CLI','VAN','TEI','LZD','GEN','CIP','LEV','NIT','SXT','MTZ','DOX','TET','RIF','OFX','PEF','MIN','JOS'],
+    organisms: ['Ureaplasma spp.','Mycoplasma hominis','Trichomonas vaginalis','Escherichia coli','Proteus spp.','Providencia spp.','Pseudomonas spp.','Gardnerella vaginalis','Staphylococcus aureus','Enterococcus faecalis','Neisseria gonorrhoeae','Streptococcus agalactiae (Gruppo B)','Candida albicans','Candida spp.','Chlamydia trachomatis','Lactobacillus spp.'],
+    screenedSpecies: [
+      { name: 'Ureaplasma spp.', method: 'A.F. Genital System' },
+      { name: 'Mycoplasma hominis', method: 'A.F. Genital System' },
+      { name: 'Trichomonas vaginalis', method: 'Esame microscopico' },
+      { name: 'Escherichia coli', method: 'A.F. Genital System' },
+      { name: 'Proteus spp. / Providencia spp.', method: 'A.F. Genital System' },
+      { name: 'Pseudomonas spp.', method: 'A.F. Genital System' },
+      { name: 'Gardnerella vaginalis', method: 'A.F. Genital System' },
+      { name: 'Staphylococcus aureus', method: 'A.F. Genital System' },
+      { name: 'Enterococcus faecalis', method: 'A.F. Genital System' },
+      { name: 'Neisseria gonorrhoeae', method: 'A.F. Genital System' },
+      { name: 'Streptococcus agalactiae (Gruppo B)', method: 'A.F. Genital System' },
+      { name: 'Candida spp.', method: 'A.F. Genital System' },
+    ],
+  },
+  uretrale: {
+    label: 'Tampone Uretrale',
+    antibiotics: ['PEN','AMP','AMX','AMC','CXM','CTX','CRO','ERY','AZI','CLA','CLI','VAN','TEI','LZD','GEN','CIP','LEV','NIT','SXT','MTZ','DOX','TET','RIF','OFX','PEF','MIN','JOS'],
+    organisms: ['Ureaplasma spp.','Mycoplasma hominis','Trichomonas vaginalis','Escherichia coli','Proteus spp.','Providencia spp.','Pseudomonas spp.','Gardnerella vaginalis','Staphylococcus aureus','Enterococcus faecalis','Neisseria gonorrhoeae','Streptococcus agalactiae (Gruppo B)','Candida albicans','Candida spp.','Chlamydia trachomatis'],
+    screenedSpecies: [
+      { name: 'Ureaplasma spp.', method: 'A.F. Genital System' },
+      { name: 'Mycoplasma hominis', method: 'A.F. Genital System' },
+      { name: 'Trichomonas vaginalis', method: 'Esame microscopico' },
+      { name: 'Escherichia coli', method: 'A.F. Genital System' },
+      { name: 'Proteus spp. / Providencia spp.', method: 'A.F. Genital System' },
+      { name: 'Pseudomonas spp.', method: 'A.F. Genital System' },
+      { name: 'Gardnerella vaginalis', method: 'A.F. Genital System' },
+      { name: 'Staphylococcus aureus', method: 'A.F. Genital System' },
+      { name: 'Enterococcus faecalis', method: 'A.F. Genital System' },
+      { name: 'Neisseria gonorrhoeae', method: 'A.F. Genital System' },
+      { name: 'Streptococcus agalactiae (Gruppo B)', method: 'A.F. Genital System' },
+      { name: 'Candida spp.', method: 'A.F. Genital System' },
+    ],
   },
   sangue: {
     label: 'Emocoltura',
@@ -226,7 +265,8 @@ const PRESETS = [
   { id:'orofaringeo', name:'Tampone Orofaringeo',  icon:'O',  desc:'Streptococco, Stafilococco', color:'#c4563a' },
   { id:'ferita',      name:'Tampone Ferita',       icon:'F',  desc:'Infezioni cute e tessuti molli', color:'#6b3fa0' },
   { id:'espettorato', name:'Espettorato',          icon:'E',  desc:'Infezioni respiratorie basse', color:'#1a6b7a' },
-  { id:'vaginale',    name:'Tampone Vaginale',     icon:'V',  desc:'Infezioni vaginali, GBS', color:'#a0527a' },
+  { id:'genitale',    name:'Tampone Genitale',    icon:'G',  desc:'Vaginale, cervicale, prepuziale — Kit A.F. Genital System', color:'#a0527a' },
+  { id:'uretrale',    name:'Tampone Uretrale',    icon:'Ur', desc:'Uretriti, screening MST — Kit A.F. Genital System', color:'#8b4a7a' },
   { id:'oculare',     name:'Tampone Oculare',      icon:'Oc', desc:'Congiuntiviti, cheratiti, dacriocistiti', color:'#2980b9' },
   { id:'sangue',      name:'Emocoltura',           icon:'S',  desc:'Batteriemia, sepsi', color:'#b82020' },
   { id:'liquor',      name:'Liquor',               icon:'L',  desc:'Meningiti, encefaliti', color:'#3a5fc4' },

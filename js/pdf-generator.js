@@ -77,6 +77,41 @@ async function generatePDF() {
     }
     y += 13;
 
+    // Screened species table (for genitale/uretrale panels)
+    const currentPanel = SAMPLE_PANELS[state.sampleType];
+    if (currentPanel && currentPanel.screenedSpecies) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(45, 90, 61);
+      doc.text('SPECIE RICERCATE (A.F. Genital System - Liofilchem ref. 74156)', mx, y); y += 3;
+
+      // Mini table header
+      doc.setFillColor(240, 245, 240); doc.rect(mx, y, cw, 4, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(5.5); doc.setTextColor(50, 50, 50);
+      doc.text('Specie', mx + 2, y + 2.8);
+      doc.text('Metodo', mx + 75, y + 2.8);
+      doc.text('Esito', mx + 130, y + 2.8);
+      y += 4;
+
+      currentPanel.screenedSpecies.forEach((sp, idx) => {
+        if (idx > 0) { doc.setDrawColor(230, 230, 230); doc.setLineWidth(0.08); doc.line(mx, y, pw - mx, y); }
+        const isIsolated = state.organism && state.organism.toLowerCase().includes(sp.name.split(' ')[0].toLowerCase());
+        doc.setFont('helvetica', 'italic'); doc.setFontSize(5.5); doc.setTextColor(30, 30, 30);
+        doc.text(sp.name, mx + 2, y + 2.8);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(100, 100, 100);
+        doc.text(sp.method, mx + 75, y + 2.8);
+        if (isIsolated) {
+          doc.setFillColor(231, 76, 60); doc.roundedRect(mx + 130, y + 0.3, 14, 3, 0.6, 0.6, 'F');
+          doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(5);
+          doc.text('ISOLATO', mx + 131, y + 2.6);
+        } else {
+          doc.setTextColor(39, 174, 96); doc.setFont('helvetica', 'normal'); doc.setFontSize(5.5);
+          doc.text('Negativo', mx + 130, y + 2.8);
+        }
+        y += 3.5;
+      });
+      doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.15); doc.line(mx, y, pw - mx, y);
+      y += 4;
+    }
+
     // Antibiogram table
     const filled = state.antibiotics.filter(a => a.sir);
     const includeGraph = document.getElementById('pdf-include-graph')?.checked;
@@ -256,7 +291,12 @@ async function generatePDF() {
       y += 2;
       doc.setFontSize(5.5); doc.setTextColor(120, 120, 120);
       let methText;
-      if (isKirbyBauer) {
+      const isGenitalKit = (state.sampleType === 'genitale' || state.sampleType === 'uretrale');
+      if (isGenitalKit) {
+        methText = 'Metodica: Identificazione e antibiogramma con sistema A.F. Genital System (Liofilchem ref. 74156). Incubazione 36+/-1 C per 24h. Lettura colorimetrica dei pozzetti.';
+        if (isKirbyBauer) methText += ' Interpretazione qualitativa S/I/R.';
+        else methText += ' Breakpoints EUCAST v15.0 (2025).';
+      } else if (isKirbyBauer) {
         methText = 'Metodica: Antibiogramma qualitativo con metodo di diffusione in agar (Kirby-Bauer). Interpretazione secondo criteri EUCAST v15.0 (2025).';
       } else {
         methText = methodology ? 'Metodica: ' + methodology.replace(/\n/g, ' | ').substring(0, 180)

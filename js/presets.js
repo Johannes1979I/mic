@@ -18,6 +18,35 @@ function renderPresets() {
 }
 
 function selectPreset(id) {
+  // If genitale, show sub-site selector first
+  if (id === 'genitale') {
+    showGenitaleSiteModal();
+    return;
+  }
+
+  applyPreset(id);
+}
+
+function showGenitaleSiteModal() {
+  const sites = SAMPLE_PANELS.genitale.subSites;
+  let html = '<div class="modal-overlay" id="genitale-modal" onclick="if(event.target===this)this.remove()">';
+  html += '<div class="modal-box" style="max-width:420px">';
+  html += '<h3 style="margin-bottom:16px;color:var(--primary)">Seleziona sede del tampone genitale</h3>';
+  sites.forEach(s => {
+    html += `<button class="btn btn-outline" style="display:block;width:100%;margin-bottom:8px;text-align:left;padding:12px 16px" onclick="selectGenitaleSite('${s}')">${s}</button>`;
+  });
+  html += '<button class="btn btn-sm" style="margin-top:8px;width:100%" onclick="this.closest(\'.modal-overlay\').remove()">Annulla</button>';
+  html += '</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function selectGenitaleSite(site) {
+  state.genitaleSite = site;
+  document.getElementById('genitale-modal')?.remove();
+  applyPreset('genitale');
+}
+
+function applyPreset(id) {
   state.preset = id;
   state.sampleType = id;
   const panel = SAMPLE_PANELS[id];
@@ -52,6 +81,8 @@ function selectPreset(id) {
   if (id === 'generico') {
     const customLabel = document.getElementById('custom-sample-label')?.value.trim();
     document.getElementById('cfg-sample-label').textContent = customLabel || panel.label;
+  } else if (id === 'genitale' && state.genitaleSite) {
+    document.getElementById('cfg-sample-label').textContent = 'Tampone Genitale — ' + state.genitaleSite;
   } else {
     document.getElementById('cfg-sample-label').textContent = panel.label;
   }
@@ -80,10 +111,13 @@ function onCustomSampleLabelChange() {
   }
 }
 
-/* Override getSampleLabel to respect custom label */
+/* Override getSampleLabel to respect custom label and genital sub-site */
 function getSampleLabel() {
   if (state.sampleType === 'generico' && SAMPLE_PANELS.generico._customLabel) {
     return SAMPLE_PANELS.generico._customLabel;
+  }
+  if (state.sampleType === 'genitale' && state.genitaleSite) {
+    return 'Tampone Genitale — ' + state.genitaleSite;
   }
   return SAMPLE_PANELS[state.sampleType]?.label || state.sampleType;
 }
