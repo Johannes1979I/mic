@@ -82,52 +82,94 @@ async function generatePDF() {
     const includeGraph = document.getElementById('pdf-include-graph')?.checked;
     const includeInterp = document.getElementById('pdf-include-interp')?.checked;
 
-    // Table header
+    // Detect method: if ANY antibiotic has a numeric MIC → MIC method; otherwise → Kirby-Bauer
+    const hasMicValues = filled.some(a => a.mic && a.mic.trim() !== '');
+    const isKirbyBauer = !hasMicValues;
+
+    // Table header — adapt columns based on method
     doc.setFillColor(45, 90, 61); doc.rect(mx, y, cw, 5, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(6); doc.setTextColor(255, 255, 255);
-    const cols = [mx + 2, mx + 42, mx + 72, mx + 96, mx + 114, mx + 138, mx + 157];
-    doc.text('Antibiotico', cols[0], y + 3.5);
-    doc.text('Classe', cols[1], y + 3.5);
-    doc.text('N. Commerciale', cols[2], y + 3.5);
-    doc.text('MIC (ug/mL)', cols[3], y + 3.5);
-    doc.text('Breakpoint EUCAST', cols[4], y + 3.5);
-    doc.text('S/I/R', cols[5], y + 3.5);
-    doc.text('Interpretaz.', cols[6], y + 3.5);
-    y += 5;
 
-    doc.setFontSize(5.5); doc.setTextColor(30, 30, 30);
-    filled.forEach((a, idx) => {
-      if (y > ph - 40) { doc.addPage(); y = my; }
-      const bg = idx % 2 === 0 ? [250, 250, 250] : [255, 255, 255];
-      doc.setFillColor(...bg); doc.rect(mx, y, cw, 4.2, 'F');
+    if (isKirbyBauer) {
+      // Kirby-Bauer: no MIC, no Breakpoint columns — wider spacing
+      const kbCols = [mx + 2, mx + 50, mx + 90, mx + 130, mx + 160];
+      doc.text('Antibiotico', kbCols[0], y + 3.5);
+      doc.text('Classe', kbCols[1], y + 3.5);
+      doc.text('N. Commerciale', kbCols[2], y + 3.5);
+      doc.text('S/I/R', kbCols[3], y + 3.5);
+      doc.text('Interpretaz.', kbCols[4], y + 3.5);
+      y += 5;
 
-      doc.setFont('helvetica', 'bold'); doc.text(a.name.substring(0, 28), cols[0], y + 3);
-      doc.setFont('helvetica', 'normal');
-      doc.text((a.class || '').substring(0, 20), cols[1], y + 3);
-      doc.text((a.brand || '').substring(0, 18), cols[2], y + 3);
-      doc.text(a.mic || '--', cols[3], y + 3);
+      doc.setFontSize(5.5); doc.setTextColor(30, 30, 30);
+      filled.forEach((a, idx) => {
+        if (y > ph - 40) { doc.addPage(); y = my; }
+        const bg = idx % 2 === 0 ? [250, 250, 250] : [255, 255, 255];
+        doc.setFillColor(...bg); doc.rect(mx, y, cw, 4.2, 'F');
 
-      // Breakpoint text
-      const bpS = a.bpS, bpR = a.bpR;
-      let bpText = '--';
-      if (bpS != null) {
-        if (bpS === bpR) bpText = 'S<=' + bpS + ' R>' + bpS;
-        else bpText = 'S<=' + bpS + ' I ' + bpS + '-' + bpR + ' R>' + bpR;
-      }
-      doc.setFontSize(5); doc.text(bpText, cols[4], y + 3); doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'bold'); doc.text(a.name.substring(0, 32), kbCols[0], y + 3);
+        doc.setFont('helvetica', 'normal');
+        doc.text((a.class || '').substring(0, 24), kbCols[1], y + 3);
+        doc.text((a.brand || '').substring(0, 22), kbCols[2], y + 3);
 
-      // S/I/R badge
-      const sirColor = a.sir === 'S' ? [39, 174, 96] : a.sir === 'I' ? [243, 156, 18] : [231, 76, 60];
-      doc.setFillColor(...sirColor);
-      doc.roundedRect(cols[5], y + 0.5, 8, 3.2, 0.8, 0.8, 'F');
-      doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold');
-      doc.text(a.sir, cols[5] + 2.5, y + 3);
-      doc.setTextColor(30, 30, 30); doc.setFont('helvetica', 'normal');
+        // S/I/R badge
+        const sirColor = a.sir === 'S' ? [39, 174, 96] : a.sir === 'I' ? [243, 156, 18] : [231, 76, 60];
+        doc.setFillColor(...sirColor);
+        doc.roundedRect(kbCols[3], y + 0.5, 8, 3.2, 0.8, 0.8, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold');
+        doc.text(a.sir, kbCols[3] + 2.5, y + 3);
+        doc.setTextColor(30, 30, 30); doc.setFont('helvetica', 'normal');
 
-      const interpText = a.sir === 'S' ? 'Sensibile' : a.sir === 'I' ? 'Intermedio' : 'Resistente';
-      doc.text(interpText, cols[6], y + 3);
-      y += 4.2;
-    });
+        const interpText = a.sir === 'S' ? 'Sensibile' : a.sir === 'I' ? 'Intermedio' : 'Resistente';
+        doc.text(interpText, kbCols[4], y + 3);
+        y += 4.2;
+      });
+
+    } else {
+      // MIC method: full table with MIC + Breakpoint columns
+      const cols = [mx + 2, mx + 42, mx + 72, mx + 96, mx + 114, mx + 138, mx + 157];
+      doc.text('Antibiotico', cols[0], y + 3.5);
+      doc.text('Classe', cols[1], y + 3.5);
+      doc.text('N. Commerciale', cols[2], y + 3.5);
+      doc.text('MIC (ug/mL)', cols[3], y + 3.5);
+      doc.text('Breakpoint EUCAST', cols[4], y + 3.5);
+      doc.text('S/I/R', cols[5], y + 3.5);
+      doc.text('Interpretaz.', cols[6], y + 3.5);
+      y += 5;
+
+      doc.setFontSize(5.5); doc.setTextColor(30, 30, 30);
+      filled.forEach((a, idx) => {
+        if (y > ph - 40) { doc.addPage(); y = my; }
+        const bg = idx % 2 === 0 ? [250, 250, 250] : [255, 255, 255];
+        doc.setFillColor(...bg); doc.rect(mx, y, cw, 4.2, 'F');
+
+        doc.setFont('helvetica', 'bold'); doc.text(a.name.substring(0, 28), cols[0], y + 3);
+        doc.setFont('helvetica', 'normal');
+        doc.text((a.class || '').substring(0, 20), cols[1], y + 3);
+        doc.text((a.brand || '').substring(0, 18), cols[2], y + 3);
+        doc.text(a.mic || '--', cols[3], y + 3);
+
+        // Breakpoint text
+        const bpS = a.bpS, bpR = a.bpR;
+        let bpText = '--';
+        if (bpS != null) {
+          if (bpS === bpR) bpText = 'S<=' + bpS + ' R>' + bpS;
+          else bpText = 'S<=' + bpS + ' I ' + bpS + '-' + bpR + ' R>' + bpR;
+        }
+        doc.setFontSize(5); doc.text(bpText, cols[4], y + 3); doc.setFontSize(5.5);
+
+        // S/I/R badge
+        const sirColor = a.sir === 'S' ? [39, 174, 96] : a.sir === 'I' ? [243, 156, 18] : [231, 76, 60];
+        doc.setFillColor(...sirColor);
+        doc.roundedRect(cols[5], y + 0.5, 8, 3.2, 0.8, 0.8, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold');
+        doc.text(a.sir, cols[5] + 2.5, y + 3);
+        doc.setTextColor(30, 30, 30); doc.setFont('helvetica', 'normal');
+
+        const interpText = a.sir === 'S' ? 'Sensibile' : a.sir === 'I' ? 'Intermedio' : 'Resistente';
+        doc.text(interpText, cols[6], y + 3);
+        y += 4.2;
+      });
+    }
     y += 3;
 
     // Chart
@@ -170,11 +212,13 @@ async function generatePDF() {
         sensible.forEach(a => {
           if (y > ph - 15) { doc.addPage(); y = my; }
           let line = '  - ' + a.name + ' (' + a.brand + ')';
-          if (a.mic) line += ' -- MIC: ' + a.mic + ' ug/mL';
-          const bpS = a.bpS, bpR = a.bpR;
-          if (bpS != null) {
-            if (bpS === bpR) line += ' [BP: S<=' + bpS + ' R>' + bpS + ']';
-            else line += ' [BP: S<=' + bpS + ' I ' + bpS + '-' + bpR + ' R>' + bpR + ']';
+          if (!isKirbyBauer && a.mic) line += ' -- MIC: ' + a.mic + ' ug/mL';
+          if (!isKirbyBauer) {
+            const bpS = a.bpS, bpR = a.bpR;
+            if (bpS != null) {
+              if (bpS === bpR) line += ' [BP: S<=' + bpS + ' R>' + bpS + ']';
+              else line += ' [BP: S<=' + bpS + ' I ' + bpS + '-' + bpR + ' R>' + bpR + ']';
+            }
           }
           doc.text(line, mx + 4, y); y += 3.2;
         });
@@ -206,19 +250,28 @@ async function generatePDF() {
       }
     }
 
-    // Methodology
+    // Methodology — auto-adapt based on method
     const methodology = document.getElementById('methodology').value;
-    if (methodology && y + 8 < ph - 12) {
+    if (y + 8 < ph - 12) {
       y += 2;
       doc.setFontSize(5.5); doc.setTextColor(120, 120, 120);
-      const methText = 'Metodica: ' + methodology.replace(/\n/g, ' | ').substring(0, 180);
+      let methText;
+      if (isKirbyBauer) {
+        methText = 'Metodica: Antibiogramma qualitativo con metodo di diffusione in agar (Kirby-Bauer). Interpretazione secondo criteri EUCAST v15.0 (2025).';
+      } else {
+        methText = methodology ? 'Metodica: ' + methodology.replace(/\n/g, ' | ').substring(0, 180)
+          : 'Metodica: Determinazione MIC (Concentrazione Minima Inibente). Breakpoints EUCAST v15.0 (2025).';
+      }
       doc.text(methText, mx, y);
       y += 4;
     }
 
     // Disclaimer
     doc.setFontSize(5); doc.setTextColor(150, 150, 150);
-    doc.text('La scelta terapeutica definitiva spetta al medico curante. Breakpoints EUCAST v15.0 (2025). Interpretazione automatica indicativa.', mx, ph - 8);
+    const discl = isKirbyBauer
+      ? 'La scelta terapeutica definitiva spetta al medico curante. Metodo Kirby-Bauer, interpretazione EUCAST v15.0 (2025).'
+      : 'La scelta terapeutica definitiva spetta al medico curante. Breakpoints EUCAST v15.0 (2025). Interpretazione automatica indicativa.';
+    doc.text(discl, mx, ph - 8);
 
     // Footer
     const pages = doc.internal.getNumberOfPages();
