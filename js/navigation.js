@@ -44,6 +44,10 @@ function proceedToResults() {
   if (filled.length === 0) { alert('Inserire almeno un risultato S/I/R.'); return; }
 
   renderResultsSummary();
-  renderResistanceChart();
   showSection('results');
+  // Charts must render AFTER section is visible (Chart.js needs visible canvas)
+  setTimeout(() => {
+    renderResistanceChart();
+    renderBarChart();
+  }, 50);
 }
