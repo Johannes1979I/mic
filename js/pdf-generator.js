@@ -77,7 +77,7 @@ async function generatePDF() {
     }
     y += 13;
 
-    // Screened species table (for genitale/uretrale panels)
+    // Screened species table (for genitale panel)
     const currentPanel = SAMPLE_PANELS[state.sampleType];
     if (currentPanel && currentPanel.screenedSpecies) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(45, 90, 61);
@@ -291,7 +291,7 @@ async function generatePDF() {
       y += 2;
       doc.setFontSize(5.5); doc.setTextColor(120, 120, 120);
       let methText;
-      const isGenitalKit = (state.sampleType === 'genitale' || state.sampleType === 'uretrale');
+      const isGenitalKit = (state.sampleType === 'genitale');
       if (isGenitalKit) {
         methText = 'Metodica: Identificazione e antibiogramma con sistema A.F. Genital System (Liofilchem ref. 74156). Incubazione 36+/-1 C per 24h. Lettura colorimetrica dei pozzetti.';
         if (isKirbyBauer) methText += ' Interpretazione qualitativa S/I/R.';
@@ -304,6 +304,15 @@ async function generatePDF() {
       }
       doc.text(methText, mx, y);
       y += 4;
+    }
+
+    // Additional notes
+    const pdfNotes = document.getElementById('pdf-notes')?.value?.trim();
+    if (pdfNotes && y + 6 < ph - 12) {
+      doc.setFontSize(6); doc.setFont('helvetica', 'italic'); doc.setTextColor(80, 80, 80);
+      const noteLines = doc.splitTextToSize('Note: ' + pdfNotes, cw);
+      noteLines.slice(0, 3).forEach(l => { doc.text(l, mx, y); y += 2.5; });
+      y += 1;
     }
 
     // Disclaimer

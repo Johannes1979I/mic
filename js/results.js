@@ -161,7 +161,6 @@ function pickFirstChoice(sensible) {
     ferita: ['AMC','CXM','SXT','CLI','DOX','CIP','LEV'],
     espettorato: ['AMC','AZI','CLA','LEV','MOX','CXM','CTX'],
     genitale: ['DOX','AZI','CLA','CLI','OFX','ERY','AMC','CTX'],
-    uretrale: ['DOX','AZI','CLA','CLI','OFX','ERY','AMC','CTX'],
     oculare: ['MOX','LEV','CIP','TOB','GEN','AZI','ERY','CXM','AMC'],
     sangue: ['CTX','CRO','TZP','MEM','VAN','DAP'],
     liquor: ['CTX','CRO','AMP','MEM','VAN'],
