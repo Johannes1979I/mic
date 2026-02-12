@@ -17,12 +17,14 @@ function renderDataTable() {
     html += `<tr class="class-separator"><td colspan="7"><span class="class-label">${cls}</span></td></tr>`;
     abs.forEach(ab => {
       const bpText = formatBreakpointRange(ab.bpS, ab.bpR);
+      const isCustom = ab._custom || (!ANTIBIOTICS_DB[ab.id]);
+      const codeDisplay = ab.id.startsWith('CUS_') ? '\u2014' : ab.id;
       html += `<tr class="abg-row" id="row-${ab.id}">
         <td class="ab-name-cell">
           <div class="ab-name">${ab.name}</div>
           <div class="ab-brand">${ab.brand}</div>
         </td>
-        <td class="ab-code-cell">${ab.id.startsWith('CUS_') ? '\u2014' : ab.id}</td>
+        <td class="ab-code-cell">${codeDisplay}</td>
         <td class="bp-cell"><span class="bp-text">${bpText}</span></td>
         <td><input type="text" class="mic-input" id="mic-${ab.id}" value="${ab.mic}" placeholder="ug/mL" oninput="onMicInput('${ab.id}')"></td>
         <td>
@@ -34,7 +36,10 @@ function renderDataTable() {
           </select>
         </td>
         <td class="sir-badge-cell" id="badge-${ab.id}"></td>
-        <td><button class="btn-remove" onclick="removeAntibiotic('${ab.id}')" title="Rimuovi">x</button></td>
+        <td style="white-space:nowrap">
+          ${isCustom ? `<button class="btn-remove" onclick="editCustomAntibiotic('${ab.id}')" title="Modifica" style="color:var(--accent);margin-right:2px">&#9998;</button>` : ''}
+          <button class="btn-remove" onclick="removeAntibiotic('${ab.id}')" title="Rimuovi">x</button>
+        </td>
       </tr>`;
     });
   });

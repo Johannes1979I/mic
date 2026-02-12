@@ -278,6 +278,11 @@ Interpretazione: S = Sensibile, I = Sensibilita intermedia (efficace a dosaggio 
         <div class="form-group"><label>Nome Commerciale</label><input type="text" id="custom-ab-brand" placeholder="Brand"></div>
         <div class="form-group"><label>Classe</label><input type="text" id="custom-ab-class" placeholder="Classe"></div>
       </div>
+      <div class="grid-3" style="margin-top:4px">
+        <div class="form-group"><label>Codice (es. AMX, CIP)</label><input type="text" id="custom-ab-code" placeholder="Codice breve" maxlength="6" style="text-transform:uppercase"></div>
+        <div class="form-group"><label>BP S &le; (mg/L)</label><input type="number" id="custom-ab-bps" placeholder="es. 8" step="any" min="0"></div>
+        <div class="form-group"><label>BP R &gt; (mg/L)</label><input type="number" id="custom-ab-bpr" placeholder="es. 8" step="any" min="0"></div>
+      </div>
       <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="addCustomAntibiotic()">+ Aggiungi Personalizzato</button>
     </div>
   </div>
